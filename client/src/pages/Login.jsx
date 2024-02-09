@@ -1,8 +1,11 @@
-import Link from "antd/es/typography/Link";
+// import Link from "antd/es/typography/Link";
 import React, { useState } from "react";
-
+import axios from "axios";
+import { message } from "antd";
+import { Link, useNavigate } from "react-router-dom";
 const Login = () => {
   // const handleSubmit=()=>{}
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -13,8 +16,22 @@ const Login = () => {
       [e.target.name]: e.target.value,
     });
   };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(formData);
+    try {
+      const res = await axios.post("/api/v1/user/login", formData);
+      if (res.data.success) {
+        localStorage.setItem("token", res.data.token);
+        message.success("Logged in successfully");
+        navigate("/");
+      } else {
+        message.error(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      message.error("somthing went wrong");
+    }
   };
   return (
     <>
@@ -44,7 +61,8 @@ const Login = () => {
                     value={formData.password}
                     className="w-full border-gray-900 border-2 rounded-lg px-2 py-2 "
                   />
-                  <Link>Dont have an account? Create Account</Link>
+                  {/* <Link>Dont have an account? Create Account</Link> */}
+                  <a href="/register"> dont have account</a>
                   <button
                     type="submit"
                     className="bg-blue-400 p-3 text-white font-bold rounded-xl shadow-lg px-5 mt-3 transition-transform transform hover:scale-105"
